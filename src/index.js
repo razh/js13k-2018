@@ -85,7 +85,24 @@ directionalLights.map(light => object3d_add(scene, light));
 
 object3d_add(scene, mesh_create(boxGeom_create(8, 8, 8), material_create()));
 
-var update = () => {};
+var dt = 1 / 60;
+var accumulatedTime = 0;
+var previousTime;
+
+var update = () => {
+  var time = (performance.now() || 0) * 1e-3;
+  if (!previousTime) {
+    previousTime = time;
+  }
+
+  var frameTime = Math.min(time - previousTime, 0.1);
+  accumulatedTime += frameTime;
+  previousTime = time;
+
+  while (accumulatedTime >= dt) {
+    accumulatedTime -= dt;
+  }
+};
 
 var bufferGeomBuffers = new WeakMap();
 
