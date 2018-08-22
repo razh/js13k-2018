@@ -27,6 +27,7 @@ export var object3d_create = () => {
   return {
     parent: undefined,
     children: [],
+    components: [],
     position: vec3_create(),
     quaternion: quat_create(),
     scale: vec3_create(1, 1, 1),

@@ -8,6 +8,7 @@ import {
   camera_updateProjectionMatrix,
 } from './camera.js';
 import { controls_create } from './controls.js';
+import { entity_update } from './entity.js';
 import { light_create } from './directionalLight.js';
 import { mat4_getInverse, mat4_multiplyMatrices } from './mat4.js';
 import { material_create } from './material.js';
@@ -100,6 +101,10 @@ var update = () => {
   previousTime = time;
 
   while (accumulatedTime >= dt) {
+    object3d_traverse(scene, object => {
+      entity_update(object, dt, scene);
+    });
+
     accumulatedTime -= dt;
   }
 };
