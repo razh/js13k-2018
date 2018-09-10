@@ -1,5 +1,6 @@
 /* global c */
 
+import {} from './audio.js';
 import { boxGeom_create } from './boxGeom.js';
 import { bufferGeom_fromGeom, bufferGeom_create } from './bufferGeom.js';
 import {
