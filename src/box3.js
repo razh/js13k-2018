@@ -88,6 +88,15 @@ export var box3_intersectsBox = (a, b) => {
   );
 };
 
+export var box3_overlapsBox = (a, b) => {
+  // prettier-ignore
+  return !(
+    a.max.x <= b.min.x || a.min.x >= b.max.x ||
+    a.max.y <= b.min.y || a.min.y >= b.max.y ||
+    a.max.z <= b.min.z || a.min.z >= b.max.z
+  );
+};
+
 export var box3_translate = (box, offset) => {
   vec3_add(box.min, offset);
   vec3_add(box.max, offset);
