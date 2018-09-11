@@ -66,7 +66,7 @@ export var box3_setFromPoints = (box, points) => {
 
 export var box3_setFromObject = (box, object) => {
   box3_makeEmpty(box);
-  box3_setFromObject(box, object);
+  box3_expandByObject(box, object);
   return box;
 };
 
