@@ -1,21 +1,13 @@
 /* global c */
 
 import {} from './audio.js';
-import { boxGeom_create } from './boxGeom.js';
 import { bufferGeom_fromGeom, bufferGeom_create } from './bufferGeom.js';
-import {
-  camera_create,
-  camera_lookAt,
-  camera_updateProjectionMatrix,
-} from './camera.js';
+import { camera_create, camera_updateProjectionMatrix } from './camera.js';
 import { controls_create } from './controls.js';
 import { entity_update } from './entity.js';
-import { light_create } from './directionalLight.js';
+import { createMap } from './maps.js';
 import { mat4_getInverse, mat4_multiplyMatrices } from './mat4.js';
-import { material_create } from './material.js';
-import { mesh_create } from './mesh.js';
 import {
-  object3d_add,
   object3d_create,
   object3d_traverse,
   object3d_updateMatrixWorld,
@@ -34,7 +26,6 @@ import {
 import {
   vec3_create,
   vec3_multiplyScalar,
-  vec3_set,
   vec3_setFromMatrixPosition,
   vec3_sub,
   vec3_transformDirection,
@@ -50,42 +41,31 @@ gl.enable(gl.DEPTH_TEST);
 gl.enable(gl.CULL_FACE);
 gl.getExtension('OES_standard_derivatives');
 
-var running = false;
+var running = true;
 
-var fogColor = vec3_create(1, 1, 1);
-var fogNear = 1;
-var fogFar = 1000;
+// Scene
+var scene = object3d_create();
+scene.fogColor = vec3_create(1, 1, 1);
+scene.fogNear = 1;
+scene.fogFar = 1000;
 
-var ambientLightColor = vec3_create(0.5, 0.5, 0.5);
+// Camera
+var camera = camera_create(90);
+pointerLock_create(controls_create(camera), c);
 
-var light = light_create(vec3_create(1, 1, 1));
-vec3_set(light.position, 128, 48, 0);
+var lights = createMap(gl, scene, camera);
 
-var directionalLights = [light];
-
+// Shader
 var program = createShaderProgram(
   gl,
   vert,
-  frag.replace(/NUM_DIR_LIGHTS/g, directionalLights.length),
+  frag.replace(/NUM_DIR_LIGHTS/g, lights.directional.length),
 );
 
 gl.useProgram(program);
 
 var attributes = getAttributeLocations(gl, program);
 var uniforms = getUniformLocations(gl, program);
-
-var scene = object3d_create();
-var camera = camera_create(60);
-vec3_set(camera.position, 64, 64, 64);
-camera_lookAt(camera, vec3_create());
-pointerLock_create(controls_create(camera), c);
-
-var cameraObject = object3d_create();
-object3d_add(cameraObject, camera);
-object3d_add(scene, cameraObject);
-directionalLights.map(light => object3d_add(scene, light));
-
-object3d_add(scene, mesh_create(boxGeom_create(8, 8, 8), material_create()));
 
 var dt = 1 / 60;
 var accumulatedTime = 0;
@@ -134,9 +114,9 @@ var bufferGeoms = new WeakMap();
 var renderMesh = mesh => {
   var { geometry, material } = mesh;
 
-  setVec3Uniform(gl, uniforms.fogColor, fogColor);
-  setFloatUniform(gl, uniforms.fogNear, fogNear);
-  setFloatUniform(gl, uniforms.floatFar, fogFar);
+  setVec3Uniform(gl, uniforms.fogColor, scene.fogColor);
+  setFloatUniform(gl, uniforms.fogNear, scene.fogNear);
+  setFloatUniform(gl, uniforms.floatFar, scene.fogFar);
 
   setVec3Uniform(gl, uniforms.diffuse, material.color);
   setVec3Uniform(gl, uniforms.specular, material.specular);
@@ -172,9 +152,9 @@ var render = () => {
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  setVec3Uniform(gl, uniforms.ambientLightColor, ambientLightColor);
+  setVec3Uniform(gl, uniforms.ambientLightColor, lights.ambient);
 
-  directionalLights.map((light, index) => {
+  lights.directional.map((light, index) => {
     var temp = vec3_create();
 
     var direction = vec3_setFromMatrixPosition(
