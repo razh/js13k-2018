@@ -66,12 +66,14 @@ export var createMap = (gl, scene, camera) => {
         player.command.forward = 0;
         player.command.right = 0;
         player.command.up = 0;
+        player.command.hook = 0;
 
         if (keys.KeyW || keys.ArrowUp) player.command.forward++;
         if (keys.KeyS || keys.ArrowDown) player.command.forward--;
         if (keys.KeyA || keys.ArrowLeft) player.command.right--;
         if (keys.KeyD || keys.ArrowRight) player.command.right++;
         if (keys.Space) player.command.up++;
+        if (keys.ShiftLeft || keys.ShiftRight) player.command.hook++;
 
         var movespeed = 127;
         player.command.forward *= movespeed;

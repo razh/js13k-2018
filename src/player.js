@@ -16,7 +16,8 @@ import {
 } from './vec3.js';
 
 // movement flags
-var PMF_JUMP_HELD = 1;
+var PMF_JUMP_HELD = 2;
+var PMF_GRAPPLE_PULL = 2048; // pull towards grapple location
 
 var JUMP_VELOCITY = 270;
 
@@ -57,6 +58,7 @@ export var player_create = (object, body) => {
       forward: 0,
       right: 0,
       up: 0,
+      hook: 0,
     },
 
     // run-time variables
@@ -208,6 +210,13 @@ export var player_airMove = (() => {
     }
 
     player_stepSlideMove(player, true);
+  };
+})();
+
+export var player_grappleMove = (() => {
+  var vel = vec3_create();
+
+  return player => {
   };
 })();
 
