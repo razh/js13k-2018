@@ -1,4 +1,4 @@
-export const vert = `
+export var vert = `
 precision highp float;
 precision highp int;
 

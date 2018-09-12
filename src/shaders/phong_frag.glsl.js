@@ -1,4 +1,4 @@
-export const frag = `
+export var frag = `
 #extension GL_OES_standard_derivatives : enable
 
 precision highp float;
