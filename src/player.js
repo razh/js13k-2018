@@ -95,7 +95,7 @@ export var player_update = player => {
   player_checkGround(player);
 };
 
-export var player_checkJump = player => {
+var player_checkJump = player => {
   if (player.command.up < 10) {
     // not holding jump
     return false;
@@ -115,7 +115,7 @@ export var player_checkJump = player => {
   return true;
 };
 
-export var player_walkMove = (() => {
+var player_walkMove = (() => {
   var wishvel = vec3_create();
   var wishdir = vec3_create();
 
@@ -160,12 +160,10 @@ export var player_walkMove = (() => {
     if (!player.body.velocity.x && !player.body.velocity.z) {
       return;
     }
-
-    player_stepSlideMove(player, false);
   };
 })();
 
-export var player_airMove = (() => {
+var player_airMove = (() => {
   var wishvel = vec3_create();
   var wishdir = vec3_create();
 
@@ -207,11 +205,11 @@ export var player_airMove = (() => {
       );
     }
 
-    player_stepSlideMove(player, true);
+    player.body.velocity.y -= player.gravity * player.dt;
   };
 })();
 
-export var player_grappleMove = (() => {
+var player_grappleMove = (() => {
   var vel = vec3_create();
   var v = vec3_create();
 
@@ -234,7 +232,7 @@ export var player_grappleMove = (() => {
   };
 })();
 
-export var player_friction = (() => {
+var player_friction = (() => {
   var vec = vec3_create();
 
   return player => {
@@ -271,7 +269,7 @@ export var player_friction = (() => {
   };
 })();
 
-export var player_cmdScale = player => {
+var player_cmdScale = player => {
   var max = Math.abs(player.command.forward);
   if (Math.abs(player.command.right) > max) {
     max = Math.abs(player.command.right);
@@ -295,7 +293,7 @@ export var player_cmdScale = player => {
   return scale;
 };
 
-export var player_accelerate = (player, wishdir, wishspeed, accel) => {
+var player_accelerate = (player, wishdir, wishspeed, accel) => {
   var currentspeed = vec3_dot(player.body.velocity, wishdir);
   var addspeed = wishspeed - currentspeed;
   if (addspeed <= 0) {
@@ -309,7 +307,7 @@ export var player_accelerate = (player, wishdir, wishspeed, accel) => {
   vec3_addScaledVector(player.body.velocity, wishdir, accelspeed);
 };
 
-export var player_checkGround = (() => {
+var player_checkGround = (() => {
   var boxA = box3_create();
   var boxB = box3_create();
 
@@ -340,29 +338,5 @@ export var player_checkGround = (() => {
     // If we do not overlap anything, we are in free fall.
     player.groundPlane = false;
     player.walking = false;
-  };
-})();
-
-export var player_stepSlideMove = (() => {
-  var endVelocity = vec3_create();
-
-  return (player, gravity) => {
-    if (gravity) {
-      Object.assign(endVelocity, player.body.velocity);
-      endVelocity.y -= player.gravity * player.dt;
-      player.body.velocity.y = (player.body.velocity.y + endVelocity.y) * 0.5;
-      if (player.groundPlane) {
-        // slide along the ground plane
-        pm_clipVelocity(
-          player.body.velocity,
-          player.groundTrace.normal,
-          OVERCLIP,
-        );
-      }
-    }
-
-    if (gravity) {
-      Object.assign(player.body.velocity, endVelocity);
-    }
   };
 })();
