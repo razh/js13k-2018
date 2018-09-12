@@ -207,6 +207,30 @@ export var createMap = (gl, scene, camera) => {
             pointMesh.position,
           );
           object3d_lookAt(rayMesh, pointMesh.position);
+
+          Object.assign(ray.origin, rayMesh.position);
+          vec3_set(ray.direction, 0, 0, 1);
+          vec3_applyQuaternion(ray.direction, rayMesh.quaternion);
+          intersections = ray_intersectObjects(
+            ray,
+            bodies
+              .map(body => body.parent)
+              .filter(object => object !== playerMesh),
+          );
+          if (intersections.length) {
+            var grappleDistance = vec3_distanceTo(
+              playerMesh.position,
+              player.grapplePoint,
+            );
+            var intersectionDistance = vec3_distanceTo(
+              playerMesh.position,
+              intersections[0].point,
+            );
+
+            if (intersectionDistance < grappleDistance) {
+              player.movementFlags &= ~PMF_GRAPPLE;
+            }
+          }
         }
       },
     }),
