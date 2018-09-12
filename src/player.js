@@ -7,17 +7,22 @@ import {
 import { physics_bodies } from './physics.js';
 import {
   vec3_create,
+  vec3_add,
   vec3_addScaledVector,
   vec3_dot,
   vec3_length,
   vec3_multiplyScalar,
   vec3_normalize,
   vec3_setScalar,
+  vec3_subVectors,
 } from './vec3.js';
 
 // movement flags
 var PMF_JUMP_HELD = 2;
-var PMF_GRAPPLE_PULL = 2048; // pull towards grapple location
+export var PMF_GRAPPLE_FLY = 1024;
+export var PMF_GRAPPLE_PULL = 2048; // pull towards grapple location
+export var PMF_GRAPPLE = PMF_GRAPPLE_FLY | PMF_GRAPPLE_PULL;
+export var GRAPPLE_SPEED = 1024;
 
 var JUMP_VELOCITY = 270;
 
@@ -67,6 +72,7 @@ export var player_create = (object, body) => {
     speed: g_speed,
     viewForward: vec3_create(),
     viewRight: vec3_create(),
+    grapplePoint: vec3_create(), // location of grapple to pull towards if PMF_GRAPPLE_PULL
 
     // walk movement
     movementFlags: 0,
@@ -86,7 +92,11 @@ export var player_update = player => {
 
   player_checkGround(player);
 
-  if (player.walking) {
+  if (player.movementFlags & PMF_GRAPPLE_PULL) {
+    player_grappleMove(player);
+    // We can wiggle a bit
+    player_airMove(player);
+  } else if (player.walking) {
     // walking on ground
     player_walkMove(player);
   } else {
@@ -215,8 +225,24 @@ export var player_airMove = (() => {
 
 export var player_grappleMove = (() => {
   var vel = vec3_create();
+  var v = vec3_create();
 
   return player => {
+    vec3_multiplyScalar(Object.assign(v, player.viewForward), -16);
+    vec3_add(v, player.grapplePoint);
+    vec3_subVectors(vel, v, player.object.position);
+    var vlen = vec3_length(vel);
+    vec3_normalize(vel);
+
+    if (vlen <= 100) {
+      vec3_multiplyScalar(vel, 10 * vlen);
+    } else {
+      vec3_multiplyScalar(vel, 800);
+    }
+
+    Object.assign(player.body.velocity, vel);
+
+    player.groundPlane = false;
   };
 })();
 
