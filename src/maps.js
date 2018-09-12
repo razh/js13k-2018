@@ -1,6 +1,8 @@
 import { boxGeom_create } from './boxGeom.js';
-import { align } from './boxTransforms.js';
+import { colors, defaultColors } from './boxColors.js';
+import { align, $scale, $translate } from './boxTransforms.js';
 import { component_create, entity_add } from './entity.js';
+import { geom_merge } from './geom.js';
 import { keys_create } from './keys.js';
 import { light_create } from './directionalLight.js';
 import { material_create } from './material.js';
@@ -36,6 +38,7 @@ import {
   vec3_set,
   vec3_subVectors,
 } from './vec3.js';
+import { compose } from './utils.js';
 
 export var createMap = (gl, scene, camera) => {
   var fogColor = [0.5, 0.48, 0.48];
@@ -211,6 +214,38 @@ export var createMap = (gl, scene, camera) => {
       },
     }),
   );
+
+  var rocks = [
+    [
+      geom_merge(
+        compose(
+          align('ny'),
+          $scale({ nx_py: 0.8, px_py: [0.6, 0.6, 0.4], nx: 0.8 }),
+          $translate({
+            px_nz: { x: -8, z: -8 },
+            px_pz: { z: -2 },
+            nx_pz: { y: -4 },
+          }),
+        )(boxGeom_create(64, 12, 64)),
+        compose(
+          align('py'),
+          $scale({ nx: 0.8, ny: [0.6, 1, 0.8] }),
+          $translate({
+            px_nz: { x: -8, z: -8 },
+            px_pz: { z: -2 },
+            nx_pz: { y: -4 },
+          }),
+          defaultColors([1, 1, 1]),
+          colors({ ny: [0.2, 0.2, 0.2] }),
+        )(boxGeom_create(64, 32, 64)),
+      ),
+      [64, 72, -256],
+    ],
+  ].map(([geom, position]) => {
+    var mesh = physics_add(mesh_create(geom, material_create()), BODY_STATIC);
+    vec3_fromArray(mesh.position, position);
+    object3d_add(map, mesh);
+  });
 
   [
     // Floor
