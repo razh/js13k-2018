@@ -1,8 +1,11 @@
 import { boxGeom_create } from './boxGeom.js';
-import { align } from './boxTransforms.js';
+import { colors, defaultColors } from './boxColors.js';
+import { align, $scale, $translate } from './boxTransforms.js';
 import { component_create, entity_add } from './entity.js';
+import { geom_merge } from './geom.js';
 import { keys_create } from './keys.js';
 import { light_create } from './directionalLight.js';
+import { fbm3d } from './fbm.js';
 import { material_create } from './material.js';
 import { mesh_create } from './mesh.js';
 import { object3d_create, object3d_add, object3d_lookAt } from './object3d.js';
@@ -32,10 +35,12 @@ import {
   vec3_distanceTo,
   vec3_fromArray,
   vec3_length,
+  vec3_multiplyScalar,
   vec3_normalize,
   vec3_set,
   vec3_subVectors,
 } from './vec3.js';
+import { compose } from './utils.js';
 
 export var createMap = (gl, scene, camera) => {
   var fogColor = [0.5, 0.48, 0.48];
@@ -211,6 +216,71 @@ export var createMap = (gl, scene, camera) => {
       },
     }),
   );
+
+  var fbm = fbm3d();
+
+  var perturbVertex = offset => {
+    return vertex =>
+      vec3_multiplyScalar(
+        vertex,
+        1 + fbm(vertex.x + offset, vertex.y + offset, vertex.z + offset),
+      );
+  };
+
+  var createPlatformGeometry = (width, depth, topHeight, bottomHeight) => {
+    var geom = geom_merge(
+      compose(
+        align('ny'),
+        $scale({ py: [0.6, 1, 0.6] }),
+      )(boxGeom_create(width, topHeight, depth)),
+      compose(
+        align('py'),
+        $scale({ ny: [0.2, 1, 0.2] }),
+        defaultColors([0.8, 0.8, 0.8]),
+        colors({ ny: [0.2, 0.2, 0.2] }),
+      )(boxGeom_create(width, bottomHeight, depth)),
+    );
+
+    geom.vertices.map(perturbVertex(width * Math.random()));
+    return geom;
+  };
+
+  // Rocks
+  [
+    [
+      geom_merge(
+        compose(
+          align('ny'),
+          $scale({ nx_py: 0.8, px_py: [0.6, 0.6, 0.4], nx: 0.8 }),
+          $translate({
+            px_nz: { x: -8, z: -8 },
+            px_pz: { z: -2 },
+            nx_pz: { y: -4 },
+          }),
+        )(boxGeom_create(64, 12, 64)),
+        compose(
+          align('py'),
+          $scale({ nx: 0.8, ny: [0.6, 1, 0.8] }),
+          $translate({
+            px_nz: { x: -8, z: -8 },
+            px_pz: { z: -2 },
+            nx_pz: { y: -4 },
+          }),
+          defaultColors([1, 1, 1]),
+          colors({ ny: [0.2, 0.2, 0.2] }),
+        )(boxGeom_create(64, 32, 64)),
+      ),
+      [64, 72, -256],
+    ],
+    [createPlatformGeometry(128, 128, 16, 32), [-64, 16, 320]],
+    [createPlatformGeometry(128, 128, 16, 32), [-32, 48, 512]],
+    [createPlatformGeometry(128, 128, 16, 32), [0, 80, 704]],
+    [createPlatformGeometry(128, 128, 16, 32), [0, 120, 920]],
+  ].map(([geom, position]) => {
+    var mesh = physics_add(mesh_create(geom, material_create()), BODY_STATIC);
+    vec3_fromArray(mesh.position, position);
+    object3d_add(map, mesh);
+  });
 
   [
     // Floor
