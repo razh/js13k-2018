@@ -9,6 +9,18 @@
       background: #000;
     }
 
+    /* reticle */
+    .r {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: .5rem;
+      height: .5rem;
+      border: 2px solid rgba(255, 255, 255, .5);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
     /* progress */
     .p {
       position: absolute;
@@ -32,6 +44,7 @@
 </head>
 <body>
   <canvas id="c"></canvas>
+  <div class="r"></div>
   <div class="p" style="--p-w: 80%"></div>
   <script type="module" src="./src/index.js"></script>
 </body>
