@@ -15,6 +15,8 @@ import {
   vec3_normalize,
   vec3_setScalar,
   vec3_subVectors,
+  pm_clipVelocity,
+  OVERCLIP,
 } from './vec3.js';
 
 // movement flags
@@ -26,8 +28,6 @@ export var GRAPPLE_SPEED = 1024;
 
 var JUMP_VELOCITY = 270;
 
-export var OVERCLIP = 1.001;
-
 // movement parameters
 var PM_STOPSPEED = 100;
 
@@ -38,18 +38,6 @@ var PM_FRICTION = 6;
 
 var g_speed = 320;
 var g_gravity = 800;
-
-export var pm_clipVelocity = (vector, normal, overbounce) => {
-  var backoff = vec3_dot(vector, normal);
-
-  if (backoff < 0) {
-    backoff *= overbounce;
-  } else {
-    backoff /= overbounce;
-  }
-
-  vec3_addScaledVector(vector, normal, -backoff);
-};
 
 export var player_create = (object, body) => {
   return {

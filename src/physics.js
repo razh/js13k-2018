@@ -12,7 +12,6 @@ import {
   entity_find,
 } from './entity.js';
 import { object3d_traverse } from './object3d.js';
-import { pm_clipVelocity, OVERCLIP } from './player.js';
 import {
   vec3_create,
   vec3_add,
@@ -21,6 +20,8 @@ import {
   vec3_normalize,
   vec3_set,
   vec3_sub,
+  pm_clipVelocity,
+  OVERCLIP,
 } from './vec3.js';
 
 export var BODY_STATIC = 1;

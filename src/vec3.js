@@ -220,3 +220,18 @@ export var vec3_fromArray = (v, array) => {
 export var vec3_X = vec3_create(1, 0, 0);
 export var vec3_Y = vec3_create(0, 1, 0);
 export var vec3_Z = vec3_create(0, 0, 1);
+
+// https://github.com/id-Software/Quake-III-Arena/blob/master/code/game/bg_pmove.c
+export var OVERCLIP = 1.001;
+
+export var pm_clipVelocity = (vector, normal, overbounce) => {
+  var backoff = vec3_dot(vector, normal);
+
+  if (backoff < 0) {
+    backoff *= overbounce;
+  } else {
+    backoff /= overbounce;
+  }
+
+  vec3_addScaledVector(vector, normal, -backoff);
+};
