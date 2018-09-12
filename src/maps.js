@@ -7,6 +7,7 @@ import { keys_create } from './keys.js';
 import { light_create } from './directionalLight.js';
 import { fbm3d } from './fbm.js';
 import { material_create } from './material.js';
+import { clamp } from './math.js';
 import { mesh_create } from './mesh.js';
 import { object3d_create, object3d_add, object3d_lookAt } from './object3d.js';
 import {
@@ -80,15 +81,16 @@ export var createMap = (gl, scene, camera) => {
   var player = player_create(playerMesh, get_physics_component(playerMesh));
   player.scene = scene;
 
+  var GRAPPLE_OFFSET = vec3_create(8, -8, 0);
+  var grappleStartDelta = vec3_create();
+  var grapplePositionDelta = vec3_create();
+
   var rayGeometry = align('nz')(boxGeom_create(2, 1, 1));
   var rayMaterial = material_create();
   vec3_set(rayMaterial.emissive, 0.75, 0.5, 0.5);
   var rayMesh = mesh_create(rayGeometry, rayMaterial);
   rayMesh.visible = false;
   object3d_add(map, rayMesh);
-  var grapplePositionDelta = vec3_create();
-  var grappleStartDelta = vec3_create();
-  var GRAPPLE_OFFSET = vec3_create(8, -8, 0);
 
   var pointGeometry = boxGeom_create(3, 3, 3);
   var pointMaterial = material_create();
@@ -96,6 +98,12 @@ export var createMap = (gl, scene, camera) => {
   var pointMesh = mesh_create(pointGeometry, pointMaterial);
   pointMesh.visible = false;
   object3d_add(map, pointMesh);
+
+  var grappleAmmo = 100;
+  var grappleFireRate = grappleAmmo / 4;
+  var grappleRegenRate = grappleAmmo / 8;
+  var progressEl = document.querySelector('.p');
+  progressEl.hidden = false;
 
   entity_add(
     map,
@@ -213,6 +221,18 @@ export var createMap = (gl, scene, camera) => {
           );
           object3d_lookAt(rayMesh, pointMesh.position);
         }
+
+        grappleAmmo += isGrappling
+          ? -grappleFireRate * dt
+          : grappleRegenRate * dt;
+        if (grappleAmmo <= 0) {
+          player.movementFlags &= ~PMF_GRAPPLE;
+          keys.ShiftLeft = false;
+          keys.ShiftRight = false;
+        }
+        grappleAmmo = clamp(grappleAmmo, 0, 100);
+
+        progressEl.style.setProperty('--p-w', `${grappleAmmo}%`);
       },
     }),
   );
