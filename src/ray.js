@@ -104,24 +104,33 @@ export var ray_intersectTriangle = (() => {
     vec3_subVectors(diff, ray.origin, a);
     var DdQxE2 =
       sign * vec3_dot(ray.direction, vec3_crossVectors(edge2, diff, edge2));
+
+    // b1 < 0, no intersection
     if (DdQxE2 < 0) {
       return;
     }
 
     var DdE1xQ = sign * vec3_dot(ray.direction, vec3_cross(edge1, diff));
+
+    // b2 < 0, no intersection
     if (DdE1xQ < 0) {
       return;
     }
 
+    // b1+b2 > 1, no intersection
     if (DdQxE2 + DdE1xQ > DdN) {
       return;
     }
 
+    // Line intersects triangle, check if ray does.
     var QdN = -sign * vec3_dot(diff, normal);
+
+    // t < 0, no intersection
     if (QdN < 0) {
       return;
     }
 
+    // Ray intersects triangle.
     return ray_at(ray, QdN / DdN, target);
   };
 })();
@@ -142,13 +151,7 @@ export var ray_intersectsMesh = (() => {
     Object.assign(intersectionPointWorld, point);
     vec3_applyMatrix4(intersectionPointWorld, object.matrixWorld);
 
-    var distance = vec3_distanceTo(ray.origin, intersectionPointWorld);
-
-    return {
-      object,
-      distance,
-      point: vec3_clone(intersectionPointWorld),
-    };
+    return vec3_clone(intersectionPointWorld);
   };
 
   return (ray, object) => {
@@ -159,12 +162,12 @@ export var ray_intersectsMesh = (() => {
 
     var { vertices, faces } = object.geometry;
 
-    faces.map((face, index) => {
+    faces.map((face, faceIndex) => {
       var a = vertices[face.a];
       var b = vertices[face.b];
       var c = vertices[face.c];
 
-      var intersection = checkIntersection(
+      var point = checkIntersection(
         object,
         rayCopy,
         a,
@@ -172,10 +175,14 @@ export var ray_intersectsMesh = (() => {
         c,
         intersectionPoint,
       );
-      if (intersection) {
-        intersection.face = face;
-        intersection.faceIndex = index;
-        intersections.push(intersection);
+      if (point) {
+        intersections.push({
+          point,
+          object,
+          face,
+          faceIndex,
+          distance: vec3_distanceTo(ray.origin, point),
+        });
       }
     });
 
