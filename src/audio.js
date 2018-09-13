@@ -79,7 +79,7 @@ var generateNotes = (fn, duration, volume) => {
 };
 
 var wet = audioContext.createGain();
-wet.gain.value = 0.5;
+wet.gain.value = 0.3;
 wet.connect(audioContext.destination);
 
 var dry = audioContext.createGain();
@@ -95,7 +95,7 @@ master.connect(dry);
 master.connect(convolver);
 
 var impulseResponse = (t, i, a) => {
-  return (2 * Math.random() - 1) * Math.pow(64, -i / a.length);
+  return (2 * Math.random() - 1) * Math.pow(a.length, -i / a.length);
 };
 
 var impulseResponseBuffer = generateAudioBuffer(impulseResponse, 2, 1);
@@ -138,7 +138,7 @@ var renderLowPassOffline = (
 };
 
 // A4 to A3.
-renderLowPassOffline(convolver, 440, 220, 1);
+renderLowPassOffline(convolver, 1760, 220, 1);
 
 // Oscillators
 // f: frequency, t: parameter.
@@ -209,9 +209,19 @@ var detune = (fn, d) => f => fn(steps(f, d));
 // Sequencer
 var d = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-var synth = mul(add(add(sin, detune(sin, 0.1)), detune(sin, -0.1)), decay(1));
+var synthFn = mul(
+  add(add(sin, detune(sin, 0.1)), detune(sin, -0.1)),
+  decay(16),
+);
+var drumFn = mul(mul(sin, noise), decay(32));
+var snareFn = mul(mul(sin, () => () => randFloatSpread(0.8)), decay(24));
+var spaceFn = mul(add(sin, detune(sin, 7)), decay(1));
 
-var synth2 = generateNotes(synth, 24, 0.4);
+var synth0 = generateNotes(synthFn, 2, 0.2);
+var synth1 = generateNotes(synthFn, 2, 0.2);
+var drum0 = generateNotes(drumFn, 2, 0.5);
+var snare0 = generateNotes(snareFn, 2, 1);
+var space0 = generateNotes(spaceFn, 6, 0.1);
 
 var W = 1000;
 var H = W / 2;
@@ -222,9 +232,35 @@ var T = S / 2;
 
 (async () => {
   var play = sound => playSound(sound, master);
-  return;
 
-  play(synth2.a3);
-  await d(E);
-  play(synth2.a3);
+  document.addEventListener('keydown', event => {
+    var sound = {
+      KeyX: synth0.a4,
+      KeyC: space0.a2,
+      KeyV: synth0.d4,
+      KeyB: synth1.a3,
+      KeyN: drum0.a1,
+      KeyM: snare0.a3,
+    }[event.code];
+
+    if (sound) {
+      play(sound);
+    }
+  });
+
+  await d(H);
+  play(drum0.a1);
+  await d(Q);
+  play(snare0.a3);
+  // return;
+  await d(H);
+  play(synth0.a3);
+  await d(H);
+  play(synth1.a3);
+  await d(S);
+  play(synth0.a3);
+  await d(S);
+  play(synth1.a3);
+  await d(S);
+  play(synth0.a3);
 })();
