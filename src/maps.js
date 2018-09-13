@@ -44,7 +44,7 @@ import {
 import { compose } from './utils.js';
 
 export var createMap = (gl, scene, camera) => {
-  var fogColor = [0.5, 0.48, 0.48];
+  var fogColor = [0.8, 0.85, 1];
   gl.clearColor(...fogColor, 1);
   vec3_set(scene.fogColor, ...fogColor);
   scene.fogFar = 2048;
@@ -57,12 +57,15 @@ export var createMap = (gl, scene, camera) => {
   // Lights
   var ambient = vec3_create(0.3, 0.3, 0.3);
 
-  var light = light_create(vec3_create(0.9, 0.85, 1));
-  vec3_set(light.position, 128, 48, 0);
+  var light0 = light_create(vec3_create(0.8, 0.8, 1));
+  vec3_set(light0.position, 0, 64, 256);
 
-  var directionalLights = [light];
+  var light1 = light_create(vec3_create(0.5, 0.5, 0.6), 4);
+  vec3_set(light1.position, 128, 512, -128);
 
-  directionalLights.map(light => object3d_add(scene, light));
+  var directionalLights = [light0, light1];
+
+  directionalLights.map(light => object3d_add(map, light));
 
   // Camera
   var cameraObject = object3d_create();
@@ -79,7 +82,7 @@ export var createMap = (gl, scene, camera) => {
   object3d_add(map, playerMesh);
 
   var player = player_create(playerMesh, get_physics_component(playerMesh));
-  player.scene = scene;
+  player.scene = map;
 
   var GRAPPLE_OFFSET = vec3_create(8, -8, 0);
   var grappleStartDelta = vec3_create();
@@ -87,7 +90,9 @@ export var createMap = (gl, scene, camera) => {
 
   var rayGeometry = align('nz')(boxGeom_create(2, 1, 1));
   var rayMaterial = material_create();
-  vec3_set(rayMaterial.emissive, 0.75, 0.5, 0.5);
+
+  vec3_set(rayMaterial.color, 0.1, 0.1, 0.1);
+  vec3_set(rayMaterial.emissive, 0.9, 0.9, 0.9);
   var rayMesh = mesh_create(rayGeometry, rayMaterial);
   rayMesh.visible = false;
   object3d_add(map, rayMesh);
@@ -257,7 +262,7 @@ export var createMap = (gl, scene, camera) => {
         align('py'),
         $scale({ ny: [0.2, 1, 0.2] }),
         defaultColors([0.8, 0.8, 0.8]),
-        colors({ ny: [0.2, 0.2, 0.2] }),
+        colors({ ny: [0.3, 0.2, 0.2] }),
       )(boxGeom_create(width, bottomHeight, depth)),
     );
 
@@ -297,7 +302,9 @@ export var createMap = (gl, scene, camera) => {
     [createPlatformGeometry(128, 128, 16, 32), [0, 80, 704]],
     [createPlatformGeometry(128, 128, 16, 32), [0, 120, 920]],
   ].map(([geom, position]) => {
-    var mesh = physics_add(mesh_create(geom, material_create()), BODY_STATIC);
+    var material = material_create();
+    material.shininess = 1;
+    var mesh = physics_add(mesh_create(geom, material), BODY_STATIC);
     vec3_fromArray(mesh.position, position);
     object3d_add(map, mesh);
   });
