@@ -241,7 +241,7 @@ export var createMap = (gl, scene, camera) => {
 
         progressEl.style.setProperty('--p-w', `${grappleAmmo}%`);
         var opacity = mapLinear(playerMesh.position.y, -512, -1536, 1, 0);
-        gameEl.style.opacity = opacity;
+        gameEl.style.opacity = clamp(opacity, 0, 1);
       },
     }),
   );

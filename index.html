@@ -7,6 +7,12 @@
     body {
       margin: 0;
       background: #000;
+      color: #fff;
+      font-family: Futura, sans-serif;
+    }
+
+    [hidden] {
+      display: none !important;
     }
 
     /* reticle */
@@ -25,13 +31,19 @@
     .p {
       position: absolute;
       display: flex;
-      overflow: hidden;
-      left: 1rem;
       bottom: 1.5rem;
+      left: 1rem;
       width: calc(50vw - 1rem);
       height: .5rem;
       background: rgba(0, 0, 0, .5);
       border-radius: 9999px;
+    }
+
+    .p::before {
+      content: 'Grappling hook';
+      position: absolute;
+      bottom: 100%;
+      margin-bottom: .5rem;
     }
 
     .p::after {
