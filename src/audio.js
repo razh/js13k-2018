@@ -221,7 +221,7 @@ var synth0 = generateNotes(synthFn, 2, 0.2);
 var synth1 = generateNotes(synthFn, 2, 0.2);
 var drum0 = generateNotes(drumFn, 2, 0.5);
 var snare0 = generateNotes(snareFn, 2, 1);
-var space0 = generateNotes(spaceFn, 6, 0.1);
+var space0 = generateNotes(spaceFn, 6, 0.3);
 
 var W = 1000;
 var H = W / 2;
@@ -230,37 +230,21 @@ var E = Q / 2;
 var S = E / 2;
 var T = S / 2;
 
-(async () => {
-  var play = sound => playSound(sound, master);
+var play = sound => playSound(sound, master);
 
-  document.addEventListener('keydown', event => {
-    var sound = {
-      KeyX: synth0.a4,
-      KeyC: space0.a2,
-      KeyV: synth0.d4,
-      KeyB: synth1.a3,
-      KeyN: drum0.a1,
-      KeyM: snare0.a3,
-    }[event.code];
+export var playSuccess = () => play(space0.e3);
+export var playFire = () => play(synth1.a3);
+export var playHit = () => play(snare0.a3);
+export var playBells = () => play(space0.a2);
 
-    if (sound) {
-      play(sound);
-    }
-  });
+var startPlaying = async () => {
+  audioContext.resume();
+};
 
-  await d(H);
-  play(drum0.a1);
-  await d(Q);
-  play(snare0.a3);
-  // return;
-  await d(H);
-  play(synth0.a3);
-  await d(H);
-  play(synth1.a3);
-  await d(S);
-  play(synth0.a3);
-  await d(S);
-  play(synth1.a3);
-  await d(S);
-  play(synth0.a3);
-})();
+var onClick = () => {
+  audioContext.resume();
+  startPlaying();
+  document.removeEventListener('click', onClick);
+};
+
+document.addEventListener('click', onClick);
