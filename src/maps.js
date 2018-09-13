@@ -276,31 +276,6 @@ export var createMap = (gl, scene, camera) => {
 
   // Rocks
   [
-    [
-      geom_merge(
-        compose(
-          align('ny'),
-          $scale({ nx_py: 0.8, px_py: [0.6, 0.6, 0.4], nx: 0.8 }),
-          $translate({
-            px_nz: { x: -8, z: -8 },
-            px_pz: { z: -2 },
-            nx_pz: { y: -4 },
-          }),
-        )(boxGeom_create(64, 12, 64)),
-        compose(
-          align('py'),
-          $scale({ nx: 0.8, ny: [0.6, 1, 0.8] }),
-          $translate({
-            px_nz: { x: -8, z: -8 },
-            px_pz: { z: -2 },
-            nx_pz: { y: -4 },
-          }),
-          defaultColors([1, 1, 1]),
-          colors({ ny: [0.2, 0.2, 0.2] }),
-        )(boxGeom_create(64, 32, 64)),
-      ),
-      [64, 72, -256],
-    ],
     [createPlatformGeometry(128, 128, 16, 32), [-64, 16, 320]],
     [createPlatformGeometry(128, 128, 16, 32), [-32, 48, 512]],
     [createPlatformGeometry(128, 128, 16, 32), [0, 80, 704]],
