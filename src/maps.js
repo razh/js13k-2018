@@ -7,7 +7,7 @@ import { keys_create } from './keys.js';
 import { light_create } from './directionalLight.js';
 import { fbm3d } from './fbm.js';
 import { material_create } from './material.js';
-import { clamp } from './math.js';
+import { clamp, mapLinear } from './math.js';
 import { mesh_create } from './mesh.js';
 import { object3d_create, object3d_add, object3d_lookAt } from './object3d.js';
 import {
@@ -107,6 +107,8 @@ export var createMap = (gl, scene, camera) => {
   var grappleAmmo = 100;
   var grappleFireRate = grappleAmmo / 4;
   var grappleRegenRate = grappleAmmo / 8;
+
+  var gameEl = document.querySelector('.g');
   var progressEl = document.querySelector('.p');
   progressEl.hidden = false;
 
@@ -238,6 +240,8 @@ export var createMap = (gl, scene, camera) => {
         grappleAmmo = clamp(grappleAmmo, 0, 100);
 
         progressEl.style.setProperty('--p-w', `${grappleAmmo}%`);
+        var opacity = mapLinear(playerMesh.position.y, -512, -1536, 1, 0);
+        gameEl.style.opacity = opacity;
       },
     }),
   );
