@@ -25,6 +25,29 @@ export var quat_copy = (a, b) => {
   return a;
 };
 
+export var quat_setFromEuler = (q, euler) => {
+  var { x, y, z } = euler;
+
+  // http://www.mathworks.com/matlabcentral/fileexchange/
+  //   20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
+  //  content/SpinCalc.m
+
+  var c1 = Math.cos(x / 2);
+  var c2 = Math.cos(y / 2);
+  var c3 = Math.cos(z / 2);
+
+  var s1 = Math.sin(x / 2);
+  var s2 = Math.sin(y / 2);
+  var s3 = Math.sin(z / 2);
+
+  q.x = s1 * c2 * c3 + c1 * s2 * s3;
+  q.y = c1 * s2 * c3 - s1 * c2 * s3;
+  q.z = c1 * c2 * s3 + s1 * s2 * c3;
+  q.w = c1 * c2 * c3 - s1 * s2 * s3;
+
+  return q;
+};
+
 export var quat_setFromAxisAngle = (q, axis, angle) => {
   // http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
   // assumes axis is normalized
