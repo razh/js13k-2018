@@ -10,6 +10,8 @@ varying vec3 vViewPosition;
 attribute vec3 color;
 varying vec3 vColor;
 
+varying float fogDepth;
+
 void main() {
   vColor.xyz = color.xyz;
 
@@ -17,5 +19,7 @@ void main() {
 
   gl_Position = projectionMatrix * mvPosition;
   vViewPosition = -mvPosition.xyz;
+
+  fogDepth = -mvPosition.z;
 }
 `.trim();
