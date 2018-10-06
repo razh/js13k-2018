@@ -2,7 +2,7 @@ import { playSuccess, playFire, playHit, playBells } from './audio.js';
 import { box3_create, box3_containsPoint } from './box3.js';
 import { boxGeom_create } from './boxGeom.js';
 import { colors, defaultColors } from './boxColors.js';
-import { align, $scale, $translate } from './boxTransforms.js';
+import { align, $scale } from './boxTransforms.js';
 import { component_create, entity_add } from './entity.js';
 import { geom_merge } from './geom.js';
 import { keys_create } from './keys.js';
@@ -34,7 +34,6 @@ import {
   vec3_add,
   vec3_addScaledVector,
   vec3_applyQuaternion,
-  vec3_clone,
   vec3_cross,
   vec3_distanceTo,
   vec3_fromArray,
@@ -167,6 +166,7 @@ export var createMap = (gl, scene, camera) => {
   if (DEBUG) {
     document.addEventListener('keydown', event => {
       if (event.code === 'ShiftRight') {
+        // eslint-disable-next-line no-console
         console.log(playerMesh.position);
       }
     });
@@ -363,8 +363,6 @@ export var createMap = (gl, scene, camera) => {
           scale * fbm(vertex.x + offset, vertex.y + offset, vertex.z + offset),
       );
   };
-
-  var _ = undefined;
 
   var createRockGeometry = (
     width,

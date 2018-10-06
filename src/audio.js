@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { randFloatSpread } from './math.js';
 
 var AudioContext = window.AudioContext || window.webkitAudioContext;
