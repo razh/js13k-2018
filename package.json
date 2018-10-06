@@ -20,13 +20,13 @@
   },
   "homepage": "https://github.com/razh/js13k-2018#readme",
   "devDependencies": {
-    "browser-sync": "2.24.7",
+    "browser-sync": "2.26.0",
     "del": "3.0.0",
     "escape-string-regexp": "1.0.5",
-    "eslint": "5.5.0",
-    "eslint-config-prettier": "3.0.1",
-    "eslint-plugin-prettier": "2.6.2",
-    "glsl-tokenizer": "2.1.4",
+    "eslint": "5.6.1",
+    "eslint-config-prettier": "3.1.0",
+    "eslint-plugin-prettier": "3.0.0",
+    "glsl-tokenizer": "2.1.5",
     "gulp": "4.0.0",
     "gulp-htmlmin": "5.0.1",
     "gulp-load-plugins": "1.5.0",
@@ -34,9 +34,9 @@
     "gulp-size": "3.0.0",
     "gulp-uglify": "3.0.1",
     "gulp-zip": "4.2.0",
-    "prettier": "1.14.2",
-    "rollup": "0.65.2",
-    "terser": "3.8.2"
+    "prettier": "1.14.3",
+    "rollup": "0.66.4",
+    "terser": "3.9.3"
   },
   "prettier": {
     "singleQuote": true,
